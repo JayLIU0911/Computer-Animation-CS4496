@@ -1,0 +1,32 @@
+language: cpp
+os:
+  - linux
+  - osx
+sudo: required
+dist: trusty
+compiler:
+  - gcc
+  - clang
+env:
+  - BUILD_CORE_ONLY=OFF BUILD_TYPE=Debug
+  - BUILD_CORE_ONLY=OFF BUILD_TYPE=Release
+  - BUILD_CORE_ONLY=ON  BUILD_TYPE=Debug
+  - BUILD_CORE_ONLY=ON  BUILD_TYPE=Release
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then 'ci/before_install_linux.sh' ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx"   ]; then 'ci/before_install_osx.sh'   ; fi
+install: 
+  - mkdir build
+  - cd build 
+  - cmake -DBUILD_CORE_ONLY=$BUILD_CORE_ONLY -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+script:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then '../ci/script_linux.sh' ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx"   ]; then '../ci/script_osx.sh'   ; fi
+after_failure:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then '../ci/after_failure_linux.sh' ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx"   ]; then '../ci/after_failure_osx.sh'   ; fi
+
